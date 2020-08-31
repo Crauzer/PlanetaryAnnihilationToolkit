@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using SixLabors;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace PlanetaryAnnihilationToolkit.PapaFile
 {
@@ -60,7 +63,8 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
                 // AnimationTable
 
                 // Construct high-level objects from tables
-                List<PapaMaterial> materials = ConstructMaterials(stringTable, materialTable);
+                List<PapaTexture> textures = ConstructTextures(stringTable, textureTable);
+                List<PapaMaterial> materials = ConstructMaterials(stringTable, materialTable, textures);
                 List<PapaMesh> meshes = ConstructMeshes(stringTable, meshTable, materials, vertexBufferTable, indexBufferTable);
                 List<PapaSkeleton> skeletons = ConstructSkeletons(stringTable, skeletonTable);
 
@@ -214,13 +218,24 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
             return tableEntries;
         }
 
-        private List<PapaMaterial> ConstructMaterials(ICollection<string> strings, ICollection<PapaEncodingMaterial> materialTable)
+        private List<PapaTexture> ConstructTextures(ICollection<string> strings, ICollection<PapaEncodingTexture> textureTable)
+        {
+            List<PapaTexture> textures = new(textureTable.Count);
+
+            foreach (PapaEncodingTexture encodingTexture in textureTable)
+            {
+                textures.Add(new PapaTexture(strings, encodingTexture));
+            }
+
+            return textures;
+        }
+        private List<PapaMaterial> ConstructMaterials(ICollection<string> strings, ICollection<PapaEncodingMaterial> materialTable, ICollection<PapaTexture> textures)
         {
             List<PapaMaterial> materials = new(materialTable.Count);
 
             foreach (PapaEncodingMaterial encodingMaterial in materialTable)
             {
-                materials.Add(new PapaMaterial(strings, encodingMaterial));
+                materials.Add(new PapaMaterial(strings, encodingMaterial, textures));
             }
 
             return materials;
@@ -263,5 +278,10 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
 
             return models;
         }
+
+        //public static Papa Combine(params Papa[] papa)
+        //{
+        //
+        //}
     }
 }

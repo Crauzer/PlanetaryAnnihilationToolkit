@@ -14,12 +14,12 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
         public List<PapaTextureParameter> TextureParameters { get; private set; } = new();
         public List<PapaMatrixParameter> MatrixParameters { get; private set; } = new();
 
-        internal PapaMaterial(ICollection<string> strings, PapaEncodingMaterial material)
+        internal PapaMaterial(ICollection<string> strings, PapaEncodingMaterial material, ICollection<PapaTexture> textures)
         {
-            this.ShaderName = material.ShaderNameIndex < 0 ? string.Empty : strings.ElementAt(material.ShaderNameIndex);
+            this.ShaderName = strings.ElementAtOrDefault(material.ShaderNameIndex);
 
             this.VectorParameters = material.VectorParameters.Select(x => new PapaVectorParameter(strings, x)).ToList();
-            this.TextureParameters = material.TextureParameters.Select(x => new PapaTextureParameter(strings, x)).ToList();
+            this.TextureParameters = material.TextureParameters.Select(x => new PapaTextureParameter(strings, x, textures)).ToList();
             this.MatrixParameters = material.MatrixParameters.Select(x => new PapaMatrixParameter(strings, x)).ToList();
         }
     }
@@ -31,19 +31,19 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
 
         internal PapaVectorParameter(ICollection<string> strings, PapaEncodingVectorParameter parameter)
         {
-            this.Name = parameter.NameIndex < 0 ? string.Empty : strings.ElementAt(parameter.NameIndex);
+            this.Name = strings.ElementAtOrDefault(parameter.NameIndex);
             this.Value = parameter.Value;
         }
     }
     public struct PapaTextureParameter
     {
         public string Name { get; private set; }
-        public ushort TextureIndex { get; private set; } // TODO: Texture
+        public PapaTexture Texture { get; private set; }
 
-        internal PapaTextureParameter(ICollection<string> strings, PapaEncodingTextureParameter parameter)
+        internal PapaTextureParameter(ICollection<string> strings, PapaEncodingTextureParameter parameter, ICollection<PapaTexture> textures)
         {
-            this.Name = parameter.NameIndex < 0 ? string.Empty : strings.ElementAt(parameter.NameIndex);
-            this.TextureIndex = parameter.TextureIndex;
+            this.Name = strings.ElementAtOrDefault(parameter.NameIndex);
+            this.Texture = textures.ElementAt(parameter.TextureIndex);
         }
     }
     public struct PapaMatrixParameter
@@ -53,7 +53,7 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
 
         internal PapaMatrixParameter(ICollection<string> strings, PapaEncodingMatrixParameter parameter)
         {
-            this.Name = parameter.NameIndex < 0 ? string.Empty : strings.ElementAt(parameter.NameIndex);
+            this.Name = strings.ElementAtOrDefault(parameter.NameIndex);
             this.Value = parameter.Value;
         }
     }

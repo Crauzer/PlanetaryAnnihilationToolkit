@@ -1,4 +1,6 @@
 ﻿using Pfim;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +12,67 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
 {
     public class PapaTexture
     {
+        public string Name { get; private set; }
+        public Pfim.IImage Image { get; private set; }
 
+        internal PapaTexture(ICollection<string> strings, PapaEncodingTexture texture)
+        {
+            this.Name = strings.ElementAtOrDefault(texture.NameIndex);
+            this.Image = texture.Image;
+        }
+
+        public void Save(string path, bool fullPath = true)
+        {
+            if (this.Image.Compressed)
+            {
+                this.Image.Decompress();
+            }
+
+            // Do not use System.IO.Path here because it fails with paths larger than MAX_PATH
+            if(fullPath)
+            {
+                if(string.IsNullOrEmpty(path))
+                {
+                    path = string.Format("{0}/{1}", Environment.CurrentDirectory, this.Name);
+                }
+                else if(Path.IsPathRooted(path))
+                {
+                    path = string.Format("{0}/{1}", path, this.Name);
+                }
+                else
+                {
+                    path = string.Format("{0}/{1}/{2}", Environment.CurrentDirectory, Path.GetDirectoryName(path), this.Name);
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(path))
+                {
+                    path = string.Format("{0}/{1}", Environment.CurrentDirectory, Path.GetFileName(this.Name));
+                }
+                else if (Path.IsPathRooted(path))
+                {
+                    path = string.Format("{0}/{1}", path, Path.GetFileName(this.Name));
+                }
+                else
+                {
+                    path = string.Format("{0}/{1}", Path.GetDirectoryName(path), Path.GetFileName(this.Name));
+                }
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+            if (this.Image.Format == ImageFormat.Rgba32)
+            {
+                var image = SixLabors.ImageSharp.Image.LoadPixelData<Bgra32>(this.Image.Data, this.Image.Width, this.Image.Height);
+                image.Save(path);
+            }
+            else if (this.Image.Format == ImageFormat.Rgb24)
+            {
+                var image = SixLabors.ImageSharp.Image.LoadPixelData<Bgr24>(this.Image.Data, this.Image.Width, this.Image.Height);
+                image.Save(path);
+            }
+        }
     }
 
     internal struct PapaEncodingTexture
@@ -22,9 +84,9 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
         internal ushort Width { get; private set; }
         internal ushort Height { get; private set; }
         internal ulong DataSize { get; private set; }
-        internal ulong DataOffset { get; private set; }
+        internal long DataOffset { get; private set; }
 
-        internal IImage Image { get; private set; }
+        internal Pfim.IImage Image { get; private set; }
 
         internal PapaEncodingTexture(BinaryReader br)
         {
@@ -39,15 +101,18 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
             this.Width = br.ReadUInt16();
             this.Height = br.ReadUInt16();
             this.DataSize = br.ReadUInt64();
-            this.DataOffset = br.ReadUInt64();
+            this.DataOffset = br.ReadInt64();
             this.Image = null;
 
             long returnOffset = br.BaseStream.Position;
-            br.BaseStream.Seek((long)this.DataOffset, SeekOrigin.Begin);
+            if(this.DataOffset > 0)
+            {
+                br.BaseStream.Seek(this.DataOffset, SeekOrigin.Begin);
 
-            byte[] imageData = br.ReadBytes((int)this.DataSize);
-            MemoryStream simulatedDds = SimulateDdsFile(imageData);
-            this.Image = Pfim.Pfim.FromStream(simulatedDds);
+                byte[] imageData = br.ReadBytes((int)this.DataSize);
+                MemoryStream simulatedDds = SimulateDdsFile(imageData);
+                this.Image = Pfim.Pfim.FromStream(simulatedDds);
+            }
 
             br.BaseStream.Seek(returnOffset, SeekOrigin.Begin);
         }
