@@ -10,7 +10,9 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
 {
     public class Papa
     {
+        public List<PapaTexture> Textures { get; private set; } = new();
         public List<PapaModel> Models { get; private set; } = new();
+        public List<PapaAnimation> Animations { get; private set; } = new();
 
         public Papa(string fileLocation) : this(File.OpenRead(fileLocation)) { }
         public Papa(Stream stream)
@@ -60,14 +62,15 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
                 PapaEncodingMesh[] meshTable = ReadMeshTable(br, meshCount, meshTableOffset);
                 PapaEncodingSkeleton[] skeletonTable = ReadSkeletonTable(br, skeletonCount, skeletonTableOffset);
                 PapaEncodingModel[] modelTable = ReadModelTable(br, modelCount, modelTableOffset);
-                // AnimationTable
+                PapaEncodingAnimation[] animationTable = ReadAnimationTable(br, animationCount, animationTableOffset);
 
                 // Construct high-level objects from tables
-                List<PapaTexture> textures = ConstructTextures(stringTable, textureTable);
-                List<PapaMaterial> materials = ConstructMaterials(stringTable, materialTable, textures);
+                this.Textures = ConstructTextures(stringTable, textureTable);
+                List<PapaMaterial> materials = ConstructMaterials(stringTable, materialTable, this.Textures);
                 List<PapaMesh> meshes = ConstructMeshes(stringTable, meshTable, materials, vertexBufferTable, indexBufferTable);
                 List<PapaSkeleton> skeletons = ConstructSkeletons(stringTable, skeletonTable);
-
+                
+                this.Animations = ConstructAnimations(stringTable, animationTable);
                 this.Models = ConstructModels(stringTable, modelTable, meshes, skeletons);
             }
         }
@@ -217,6 +220,23 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
 
             return tableEntries;
         }
+        private PapaEncodingAnimation[] ReadAnimationTable(BinaryReader br, short count, long tableOffset)
+        {
+            PapaEncodingAnimation[] tableEntries = new PapaEncodingAnimation[count];
+
+            if (tableOffset < 0)
+            {
+                return tableEntries;
+            }
+
+            br.BaseStream.Seek(tableOffset, SeekOrigin.Begin);
+            for (int i = 0; i < count; i++)
+            {
+                tableEntries[i] = new PapaEncodingAnimation(br);
+            }
+
+            return tableEntries;
+        }
 
         private List<PapaTexture> ConstructTextures(ICollection<string> strings, ICollection<PapaEncodingTexture> textureTable)
         {
@@ -277,6 +297,17 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
             }
 
             return models;
+        }
+        private List<PapaAnimation> ConstructAnimations(ICollection<string> strings, ICollection<PapaEncodingAnimation> animationTable)
+        {
+            List<PapaAnimation> animations = new List<PapaAnimation>();
+
+            foreach(PapaEncodingAnimation encodingAnimation in animationTable)
+            {
+                animations.Add(new PapaAnimation(strings, encodingAnimation));
+            }
+
+            return animations;
         }
 
         //public static Papa Combine(params Papa[] papa)

@@ -8,10 +8,10 @@ namespace PlanetaryAnnihilationToolkit.Sandbox
     {
         static void Main(string[] args)
         {
-            Papa papa = new Papa("lava_crack_01.papa");
+            Papa papa = new Papa("assault_bot_adv_anim_idle.papa");
             ModelRoot gltf = papa.ToGLTF();
             
-            gltf.SaveGLTF("lava_crack_01.papa.gltf");
+            gltf.SaveGLTF("assault_bot_adv_anim_idle.papa.gltf");
 
             Console.WriteLine("Hello World!");
         }
