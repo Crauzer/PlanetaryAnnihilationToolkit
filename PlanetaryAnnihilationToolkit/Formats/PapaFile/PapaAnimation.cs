@@ -24,10 +24,9 @@ namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
             {
                 this.BoneFrameTransforms.Add(boneIndex, new List<PapaAnimationTransform>(animation.FrameCount));
 
-                int startTransform = boneIndex * animation.FrameCount;
                 for (int i = 0; i < animation.FrameCount; i++)
                 {
-                    this.BoneFrameTransforms[boneIndex].Add(new PapaAnimationTransform(animation.Transforms[i + startTransform]));
+                    this.BoneFrameTransforms[boneIndex].Add(new PapaAnimationTransform(animation.Transforms[boneIndex * animation.FrameCount + i]));
                 }
             }
         }

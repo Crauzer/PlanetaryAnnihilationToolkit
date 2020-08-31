@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using SixLabors;
 using SixLabors.ImageSharp;
@@ -340,6 +341,39 @@ namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
             if (papa is null)
             {
                 throw new ArgumentNullException(nameof(papa), "must not be null");
+            }
+
+            foreach(PapaTexture texture in papa.Textures)
+            {
+                if(this.Textures.FirstOrDefault(x => !string.IsNullOrEmpty(x.Name) && x.Name == texture.Name) is PapaTexture originalTexture)
+                {
+                    originalTexture.CopyDataFromTexture(texture);
+                }
+                else
+                {
+                    this.Textures.Add(texture);
+                }
+            }
+
+            foreach(PapaAnimation animation in papa.Animations)
+            {
+                // Check if animation already exists
+                if(this.Animations.Any(x => !string.IsNullOrEmpty(x.Name) && x.Name == animation.Name))
+                {
+                    throw new Exception("Found an already existing animation");
+                }
+
+                this.Animations.Add(animation);
+            }
+
+            foreach (PapaModel model in papa.Models)
+            {
+                if (this.Models.Any(x => !string.IsNullOrEmpty(x.Name) && x.Name == model.Name))
+                {
+                    throw new Exception("Found an already existing model");
+                }
+
+                this.Models.Add(model);
             }
 
             return this;

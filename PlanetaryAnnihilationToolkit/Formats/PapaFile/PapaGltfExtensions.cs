@@ -39,6 +39,11 @@ namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
                             .CreateNode(papaModel.Name)
                             .WithSkinnedMesh(root.CreateMesh(BuildSkinnedMesh(meshBinding)), skeleton.ToArray());
                     }
+
+                    if(papa.Animations.Count != 0)
+                    {
+                        CreateAnimations(root, skeleton, papa.Animations);
+                    }
                 }
                 else
                 {
@@ -241,6 +246,45 @@ namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
             }
 
             return bones;
+        }
+        private static void CreateAnimations(ModelRoot root, List<(Node, Matrix4x4)> skeleton, ICollection<PapaAnimation> animations)
+        {
+            // Create a list of animation names
+            List<string> animationNames = new(animations.Count);
+            for(int i = 0; i < animations.Count; i++)
+            {
+                PapaAnimation animation = animations.ElementAt(i);
+                if (string.IsNullOrEmpty(animation.Name)) animationNames.Add("Animation" + i);
+                else animationNames.Add(animation.Name);
+            }
+
+            for(int i = 0; i < animations.Count; i++)
+            {
+                Animation gltfAnimation = root.UseAnimation(animationNames[i]);
+                PapaAnimation papaAnimation = animations.ElementAt(i);
+
+                float frameDuration = 1 / papaAnimation.FPS;
+                foreach(var boneTransforms in papaAnimation.BoneFrameTransforms)
+                {
+                    Dictionary<float, Vector3> translations = new();
+                    Dictionary<float, Quaternion> rotations = new();
+                    Node boneNode = skeleton[boneTransforms.Key].Item1;
+
+                    // Build transform maps
+                    float frameTime = 0;
+                    foreach(PapaAnimationTransform transform in boneTransforms.Value)
+                    {
+                        translations.Add(frameTime, transform.Translation);
+                        rotations.Add(frameTime, transform.Rotation);
+
+                        frameTime += frameDuration;
+                    }
+
+                    // Create channels
+                    gltfAnimation.CreateTranslationChannel(boneNode, translations, false);
+                    gltfAnimation.CreateRotationChannel(boneNode, rotations, false);
+                }
+            }
         }
     }
 }

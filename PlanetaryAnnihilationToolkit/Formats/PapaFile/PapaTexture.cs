@@ -73,6 +73,11 @@ namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
                 image.Save(path);
             }
         }
+
+        internal void CopyDataFromTexture(PapaTexture texture)
+        {
+            this.Image = texture.Image;
+        }
     }
 
     internal struct PapaEncodingTexture
