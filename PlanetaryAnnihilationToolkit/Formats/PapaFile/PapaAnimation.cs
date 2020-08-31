@@ -6,7 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 
-namespace PlanetaryAnnihilationToolkit.PapaFile
+namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
 {
     public class PapaAnimation
     {

@@ -1,4 +1,4 @@
-﻿using PlanetaryAnnihilationToolkit.PapaFile;
+﻿using PlanetaryAnnihilationToolkit.Formats.PapaFile;
 using SharpGLTF.Schema2;
 using System;
 

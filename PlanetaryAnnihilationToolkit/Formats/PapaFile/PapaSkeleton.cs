@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 
-namespace PlanetaryAnnihilationToolkit.PapaFile
+namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
 {
     public class PapaSkeleton
     {

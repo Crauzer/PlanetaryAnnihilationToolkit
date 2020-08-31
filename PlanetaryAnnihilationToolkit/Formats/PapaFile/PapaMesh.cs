@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace PlanetaryAnnihilationToolkit.PapaFile
+namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
 {
     public class PapaMesh
     {

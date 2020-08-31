@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace PlanetaryAnnihilationToolkit.PapaFile
+namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
 {
     internal struct PapaEncodingIndexBuffer
     {

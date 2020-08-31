@@ -3,7 +3,7 @@ using PlanetaryAnnihilationToolkit.Helpers.Structures;
 using System.IO;
 using System.Numerics;
 
-namespace PlanetaryAnnihilationToolkit.PapaFile
+namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
 {
     public struct PapaVertex
     {

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace PlanetaryAnnihilationToolkit.PapaFile
+namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
 {
     using VERTEX = VertexBuilder<VertexPositionNormal, VertexColor2Texture2, VertexEmpty>;
     using VERTEX_SKINNED = VertexBuilder<VertexPositionNormal, VertexColor2Texture2, VertexJoints4>;
