@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Pfim" Version="0.9.1" />
     <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.0-alpha0019" />
   </ItemGroup>
 
