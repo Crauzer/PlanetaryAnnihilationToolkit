@@ -94,7 +94,6 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
             this.Format = (PapaTextureFormat)br.ReadByte();
 
             byte bits = br.ReadByte();
-
             this.MipCount = (byte)(bits & 0b01111111);
             this.IsSrgb = ((bits >> 7) & 1) == 1;
 
