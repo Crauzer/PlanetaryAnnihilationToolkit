@@ -310,9 +310,39 @@ namespace PlanetaryAnnihilationToolkit.Formats.PapaFile
             return animations;
         }
 
-        //public static Papa Combine(params Papa[] papa)
-        //{
-        //
-        //}
+        public static Papa Merge(params Papa[] papaFiles)
+        {
+            if(papaFiles is null)
+            {
+                throw new ArgumentNullException(nameof(papaFiles), "must not be null");
+            }
+            if(papaFiles.Length == 0)
+            {
+                throw new ArgumentException("please provide at least 1 papa file", nameof(papaFiles));
+            }
+            if(papaFiles.Length == 1)
+            {
+                return papaFiles[0];
+            }
+
+            Papa basePapa = papaFiles[0];
+            for(int i = 1; i < papaFiles.Length; i++)
+            {
+                Papa papaToMerge = papaFiles[i];
+
+                basePapa.Merge(papaToMerge);
+            }
+
+            return basePapa;
+        }
+        public Papa Merge(Papa papa)
+        {
+            if (papa is null)
+            {
+                throw new ArgumentNullException(nameof(papa), "must not be null");
+            }
+
+            return this;
+        }
     }
 }
