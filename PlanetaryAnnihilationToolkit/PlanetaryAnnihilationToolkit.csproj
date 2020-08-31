@@ -5,4 +5,8 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.0-alpha0019" />
+  </ItemGroup>
+
 </Project>

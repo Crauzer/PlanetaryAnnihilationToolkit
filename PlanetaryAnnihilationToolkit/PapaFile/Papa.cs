@@ -50,7 +50,7 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
 
                 // Read all tables from file
                 string[] stringTable = ReadStringTable(br, stringCount, stringTableOffset);
-                // TextureTable
+                PapaEncodingTexture[] textureTable = ReadTextureTable(br, textureCount, textureTableOffset);
                 PapaEncodingVertexBuffer[] vertexBufferTable = ReadVertexBufferTable(br, vertexBufferCount, vertexBufferTableOffset);
                 PapaEncodingIndexBuffer[] indexBufferTable = ReadIndexBufferTable(br, indexBufferCount, indexBufferTableOffset);
                 PapaEncodingMaterial[] materialTable = ReadMaterialTable(br, materialCount, materialTableOffset);
@@ -90,6 +90,23 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
                 tableEntries[i] = Encoding.UTF8.GetString(br.ReadBytes((int)stringLength));
 
                 br.BaseStream.Seek(returnOffset, SeekOrigin.Begin);
+            }
+
+            return tableEntries;
+        }
+        private PapaEncodingTexture[] ReadTextureTable(BinaryReader br, short count, long tableOffset)
+        {
+            PapaEncodingTexture[] tableEntries = new PapaEncodingTexture[count];
+
+            if (tableOffset < 0)
+            {
+                return tableEntries;
+            }
+
+            br.BaseStream.Seek(tableOffset, SeekOrigin.Begin);
+            for (int i = 0; i < count; i++)
+            {
+                tableEntries[i] = new PapaEncodingTexture(br);
             }
 
             return tableEntries;

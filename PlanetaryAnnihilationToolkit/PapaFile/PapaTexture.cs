@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,30 @@ namespace PlanetaryAnnihilationToolkit.PapaFile
 
     internal struct PapaEncodingTexture
     {
+        internal short NameIndex { get; private set; }
+        internal PapaTextureFormat Format { get; private set; }
+        internal byte MipCount { get; private set; }
+        internal byte IsSrgb { get; private set; }
+        internal ushort Width { get; private set; }
+        internal ushort Height { get; private set; }
+        internal ulong DataSize { get; private set; }
+        internal ulong DataOffset { get; private set; }
 
+        internal PapaEncodingTexture(BinaryReader br)
+        {
+            this.NameIndex = br.ReadInt16();
+            this.Format = (PapaTextureFormat)br.ReadByte();
+
+            byte bits = br.ReadByte();
+
+            this.MipCount = (byte)(bits & 0b01111111);
+            this.IsSrgb = (byte)(bits & 0b1000000);
+
+            this.Width = br.ReadUInt16();
+            this.Height = br.ReadUInt16();
+            this.DataSize = br.ReadUInt64();
+            this.DataOffset = br.ReadUInt64();
+        }
     }
 
     public enum PapaTextureFormat : byte
